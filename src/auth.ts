@@ -1,31 +1,24 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-// Your own logic for dealing with plaintext password strings; be careful!
-const login = (email: String, password: String) => {};
+
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
-      // You can specify which fields should be submitted, by adding keys to the `credentials` object.
-      // e.g. domain, username, password, 2FA token, etc.
       credentials: {
-        email: {},
-        password: {},
+        username: { label: "Username", type: "text"},
+        password: { label: "Password", type: "password" },
       },
-      authorize: async (credentials) => {
-        let user = null;
-
-        // user = await login(credentials.email, credentials.password);
-
-        if (!user) {
-          // No user found, so this is their first attempt to login
-          // meaning this is also the place you could do registration
-          throw new Error("User not found.");
+      async authorize(credentials : any): Promise<any> {
+        const user = { id: 1, name: "admin", password: "password" };
+        if (credentials.username === user.name && credentials.password === user.password) {
+          return user;
         }
-
-        // return user object with the their profile data
-        return user;
+        else {
+          return null;
+        }
       },
     }),
   ],
+  secret: process.env.AUTH_SECRET,
 });
